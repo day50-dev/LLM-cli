@@ -383,7 +383,11 @@ https://github.com/day50-dev/llcat""")
 
     # The actual call
 
-    assistant_response = ''
+    assistant = {
+        'content': '',
+        'reasoning': '',
+        'tool_calls': []
+    }
 
     while True:
         r = safecall(f'{base_url}/v1/chat/completions',req,headers)
@@ -396,11 +400,14 @@ https://github.com/day50-dev/llcat""")
                 delta = chunk['choices'][0]['delta']
                 content = delta.get('content', '') 
                 reasoning = delta.get('reasoning', '')
+                tool_calls = delta.get('tool_calls', [])
+
                 if len(reasoning.strip()) and not 'think' in SHUTUP:
                     if not is_thinking:
                         print("<think>")
                         is_thinking = True
 
+                    assistant['reasoning'] += reasoning
                     print(reasoning, end='', flush=True)
 
                 elif content:
@@ -409,20 +416,19 @@ https://github.com/day50-dev/llcat""")
                         is_thinking = False
 
                     print(content, end='', flush=True)
-                    assistant_response += content
+                    assistant['content'] += content
                 
-                if 'tool_calls' in delta:
-                    for tc in delta['tool_calls']:
-                        idx = tc.get('index', 0)
-                        if idx >= len(tool_call_list):
-                            tool_call_list.append({'id': '', 'type': 'function', 'function': {'name': '', 'arguments': ''}})
-                        
-                        if 'id' in tc:
-                            tool_call_list[idx]['id'] = tc['id']
-                        if 'function' in tc:
-                            for key in ['name','arguments']:
-                                if key in tc['function']:
-                                    tool_call_list[idx]['function'][key] += tc['function'][key]
+                for tc in tool_calls:
+                    idx = tc.get('index', 0)
+                    if idx >= len(tool_call_list):
+                        tool_call_list.append({'id': '', 'type': 'function', 'function': {'name': '', 'arguments': ''}})
+                    
+                    if 'id' in tc:
+                        tool_call_list[idx]['id'] = tc['id']
+                    if 'function' in tc:
+                        for key in ['name','arguments']:
+                            if key in tc['function']:
+                                tool_call_list[idx]['function'][key] += tc['function'][key]
 
             except Exception as ex:
                 err_out(what="toolcall", message=traceback.format_exc(), obj=data)
@@ -447,6 +453,7 @@ https://github.com/day50-dev/llcat""")
             
             messages.append({
                 'role': 'tool',
+                'name': fname,
                 'tool_call_id': tool_call['id'],
                 'content': result
             })
@@ -461,8 +468,16 @@ https://github.com/day50-dev/llcat""")
             break
 
     if args.conversation and not args.cr:
-        if len(assistant_response):
-            messages.append({'role': 'assistant', 'content': assistant_response})
+        do_append = False
+        newline = {'role': 'assistant'}
+        print(newline)
+        for k,v in assistant.items():
+            if len(v):
+                newline[k] = v
+                do_append = True
+
+        if do_append:
+            messages.append(newline)
             try:
                 with open(args.conversation, 'w') as f:
                     json.dump(messages, f, indent=2)

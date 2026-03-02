@@ -11,7 +11,8 @@
             "type": "string",
             "description": "An optional path to search for files, otherwise cwd"
           }
-        }
+        },
+        "required": ["path"]
       }
     }
   },
@@ -32,7 +33,7 @@
             "description": "The path that was previously used"
           }
         },
-        "required": ["filename"]
+        "required": ["filename", "path"]
       }
     }
   }
