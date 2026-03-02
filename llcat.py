@@ -382,7 +382,6 @@ https://github.com/day50-dev/llcat""")
         req['tools'] = tools
 
     # The actual call
-
     assistant = {
         'content': '',
         'reasoning': '',
@@ -470,7 +469,7 @@ https://github.com/day50-dev/llcat""")
     if args.conversation and not args.cr:
         do_append = False
         newline = {'role': 'assistant'}
-        print(newline)
+        #print(newline)
         for k,v in assistant.items():
             if len(v):
                 newline[k] = v
