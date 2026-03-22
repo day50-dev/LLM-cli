@@ -396,6 +396,11 @@ https://github.com/day50-dev/llcat""")
         for data in tool_gen(r):
             try:
                 chunk = json.loads(data)
+
+                # nvidia's inference does things in a weird way
+                if len(chunk['choices']) == 0:
+                    break
+
                 delta = chunk['choices'][0]['delta']
                 content = delta.get('content', '') 
                 reasoning = delta.get('reasoning', delta.get('reasoning_content', ''))
