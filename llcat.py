@@ -287,6 +287,7 @@ https://github.com/day50-dev/llcat""")
             lhs = args.server_url
 
         base_url = lhs.rstrip('/').removesuffix('/v1')
+        if "//" not in base_url: base_url = "https://" + base_url
 
     headers = {'Content-Type': 'application/json'}
     if args.server_key:
