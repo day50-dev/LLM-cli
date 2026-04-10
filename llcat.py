@@ -7,6 +7,7 @@ logging.basicConfig(level=(os.environ.get('LOGLEVEL') or 'warning').upper())
 VERSION = None
 SHUTUP = []
 CURLIFY = False
+TIMEOUT = None
 
 def create_content_with_attachments(text_prompt, attachment_list):
     import base64, re
@@ -73,9 +74,9 @@ def safecall(base_url, req = None, headers = {}, what = "post"):
     try:
         logging.debug(f"request {req}")
         if what == 'post':
-            r = requests.post(base_url, json=req, headers=headers, stream=True)
+            r = requests.post(base_url, json=req, headers=headers, stream=True, timeout=TIMEOUT)
         else:
-            r = requests.get(base_url, headers=headers, stream=True)
+            r = requests.get(base_url, headers=headers, stream=True, timeout=TIMEOUT)
 
         if CURLIFY:
             import curlify
@@ -258,6 +259,7 @@ https://github.com/day50-dev/llcat""")
     parser.add_argument('-mf', '--mcp_file', help='MCP file to use')
     parser.add_argument('-tf', '--tool_file', help='JSON file with tool definitions')
     parser.add_argument('-tp', '--tool_program', help='Program to execute tool calls')
+    parser.add_argument('-to', '--timeout', type=int, default=5, help='Timeout in seconds for the read')
     parser.add_argument('-a',  '--attach', action='append', help='Attach file(s)')
     parser.add_argument('-bq', '--be_quiet', action='append', help='Make it shutup about things')
     parser.add_argument('-nw', '--no_wrap', action='store_true', help='Do not wrap inputs in <xml-like-syntax>')
@@ -273,6 +275,8 @@ https://github.com/day50-dev/llcat""")
     if args.be_quiet:
         global SHUTUP
         SHUTUP = set((','.join(args.be_quiet)).split(','))
+
+    globals()['TIMEOUT'] = args.timeout
 
     # Server and headers
     if args.server_url:
