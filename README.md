@@ -7,7 +7,15 @@
 
 *"What if OpenAI’s API docs were a Unix tool?"*
 
-**llcat** is a general-purpose CLI-based OpenAI-compatible `/chat/completions` caller. 
+**llcat**, part of the [DAY50](https://day50.dev) suite of open-source tools for AI workflows, allows for targeted precision, focused interaction with models and servers in order to do things like 
+ * show a server's models
+ * see each model capabilities
+ * do tool-calls
+ * manage context windows
+   
+llcat works through regular JSON files through a principle of "least magic" - prioritizing predictability, compatibility, coherency, transparency and functionality.
+
+It exists as a general-purpose CLI-based OpenAI-compatible `/chat/completions` caller. 
 
 It is like cURL or cat for LLMs: a stateless, transparent, explicit, low-level, composable tool for scripting and glue.
 
