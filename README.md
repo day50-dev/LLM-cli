@@ -241,10 +241,10 @@ There's ways of doing the network transports with this script as well. All you n
 Now it's your turn. 
 
 ```shell
-usage: llcat [-h] [-su SERVER_URL] [-sk SERVER_KEY] [-m [MODEL]] [-s SYSTEM]
-             [-c CONVERSATION] [-cr] [-mf MCP_FILE] [-tf TOOL_FILE]
-             [-tp TOOL_PROGRAM] [-a ATTACH] [-bq BE_QUIET] [-nw] [--version]
-             [--info [INFO]]
+usage: llcat [-h] [-su SERVER_URL] [-sk SERVER_KEY] [-m [MODEL]]
+             [-s SYSTEM] [-c CONVERSATION] [-cr] [-mf MCP_FILE]
+             [-tf TOOL_FILE] [-tp TOOL_PROGRAM] [-to TIMEOUT] [-a ATTACH]
+             [-bq BE_QUIET] [-nw] [--curlify] [--version] [--info [INFO]]
              [user_prompt ...]
 
 llcat is /usr/bin/cat for LLMs. 
@@ -259,7 +259,8 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   -su, -u, --server_url SERVER_URL
-                        Server URL (e.g., http://::1:8080)
+                        Server URL (e.g., http://::1:8080). Also supports MSA
+                        format
   -sk, -k, --server_key SERVER_KEY
                         Server API key for authorization
   -m, --model [MODEL]   Model to use (or list models if no value)
@@ -273,10 +274,13 @@ options:
                         JSON file with tool definitions
   -tp, --tool_program TOOL_PROGRAM
                         Program to execute tool calls
+  -to, --timeout TIMEOUT
+                        Timeout in seconds for the read
   -a, --attach ATTACH   Attach file(s)
   -bq, --be_quiet BE_QUIET
                         Make it shutup about things
   -nw, --no_wrap        Do not wrap inputs in <xml-like-syntax>
+  --curlify             Write curl equivalents of calls to stdout
   --version             show program's version number and exit
   --info [INFO]         Get the info for a model
 ```
