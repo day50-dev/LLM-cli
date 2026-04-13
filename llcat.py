@@ -129,11 +129,15 @@ def mcp_start(server_config):
 
     proc.stdin.flush()  
 
-    rlist, _, _ = select.select([proc.stderr, proc.stdout], [], [], 10.0)
-    if proc.stderr in rlist:
-        err_out(what="toolcall", message=proc.stderr.readline(), obj=cmd)
-    if proc.stdout in rlist:
-        proc.stdout.readline()
+    while True:
+        rlist, _, _ = select.select([proc.stderr, proc.stdout], [], [], 10.0)
+        if proc.stderr in rlist:
+            err_out(what="toolcall", message=proc.stderr.readline(), obj=cmd)
+            continue
+
+        if proc.stdout in rlist:
+            proc.stdout.readline()
+            break
 
     return proc, rpc
 
