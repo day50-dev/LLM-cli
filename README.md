@@ -5,7 +5,15 @@
 </p>
 <hr>
 
-*"What if OpenAI’s API docs were a Unix tool?"*
+You want to pipe something into or out of a model sitting on a server. 
+
+The existing tools take too much effort: 
+ * install some plugins
+ * pick from a pre-baked provider boutique
+ * your model isn't listed
+ * you swap out the credentials like you're Indiana Jones with a bag of sand
+
+This fixes all that noise.
 
 **llcat**, part of the [DAY50](https://day50.dev) suite of open-source tools for AI workflows, allows for targeted precision, focused interaction with models and servers in order to do things like 
  * show a server's models
