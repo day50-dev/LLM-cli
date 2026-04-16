@@ -7,11 +7,11 @@
 
 You want to pipe something into or out of a model sitting on a server. 
 
-The existing tools take too much effort: 
+Existing tools require you to:
  * install some plugins
  * pick from a pre-baked provider boutique
- * your model isn't listed
- * you swap out the credentials like you're Indiana Jones with a bag of sand
+ * pick from a list of models which doesn't have yours
+ * swap around credentials like you're Indiana Jones with a bag of sand
 
 This fixes all that noise.
 
