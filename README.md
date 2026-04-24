@@ -39,6 +39,24 @@ List the models on [OpenRouter](https://openrouter.ai):
 
 `uvx llcat -u https://openrouter.ai/api -m`
 
+What about just the qwen ones?
+
+`uvx llcat -u https://openrouter.ai/api -m '*qwen3*'`
+
+And what about their capabilities in a unified json format?
+
+`uvx llcat -u https://openrouter.ai/api -m '*qwen3*' --info | jq .`
+
+Alright cool, but what about a different protocol, say ollama?
+
+`uvx llcat -u http://localhost:11434 -m '*qwen3*' --info | jq .`
+
+You might think "That's funny ... it looks the same."
+
+Correct. Welcome to llcat. 
+
+All the abstraction without those pesky leaks.
+
 ----
 
 **llcat** can:
