@@ -43,11 +43,11 @@ What about just the qwen ones?
 
 `uvx llcat -u https://openrouter.ai/api -m '*qwen3*'`
 
-And what about their capabilities in a unified json format?
+What about their capabilities in JSON?
 
 `uvx llcat -u https://openrouter.ai/api -m '*qwen3*' --info | jq .`
 
-Alright cool, but what about a different protocol, say ollama?
+Sure. What about a different protocol, say ollama?
 
 `uvx llcat -u http://localhost:11434 -m '*qwen3*' --info | jq .`
 
