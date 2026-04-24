@@ -8,10 +8,12 @@
 You want to pipe something into or out of a model sitting on a server. 
 
 Existing tools require you to:
- * install some plugins
+ * install plugins
  * pick from a pre-baked provider boutique
- * pick from a list of models which doesn't have yours
+ * pick a list of models which don't update
  * swap around credentials like you're Indiana Jones with a bag of sand
+
+It's wildly inconvenient.
 
 This fixes all that noise.
 
@@ -30,7 +32,7 @@ It is like cURL or cat for LLMs: a stateless, transparent, explicit, low-level, 
 Conversations, keys, servers and other configurations are explicitly specified each execution as command line arguments. 
 This makes building things with llcat simple and direct.
 
-There is no caching or state saved between runs. Everything gets surfaced and errors are JSON parsable.
+There is no caching or state saved between runs. Everything gets surfaced and errors are JSON parsable. There's a `--curlify` option as well. It's also quite fast and permits custom timeouts.
 
 ## Very Quick Start
 List the models on [OpenRouter](https://openrouter.ai):
