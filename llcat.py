@@ -73,15 +73,24 @@ def safecall(base_url, req = None, headers = {}, what = "post"):
 
     try:
         logging.debug(f"request {req}")
+        
+        session = requests.Session()
+        req_kwargs = {
+            'method': what.upper(),
+            'url': base_url,
+            'headers': headers,
+        }
         if what == 'post':
-            r = requests.post(base_url, json=req, headers=headers, stream=True, timeout=TIMEOUT)
-        else:
-            r = requests.get(base_url, headers=headers, stream=True, timeout=TIMEOUT)
+            req_kwargs['json'] = req
+            
+        req_obj = requests.Request(**req_kwargs)
+        prepared = session.prepare_request(req_obj)
 
         if CURLIFY:
             import curlify
-            print(curlify.to_curl(r.request), file=sys.stderr)
+            print(curlify.to_curl(prepared), file=sys.stderr)
 
+        r = session.send(prepared, stream=True, timeout=TIMEOUT)
         r.raise_for_status()  
 
     except Exception as e:
@@ -223,6 +232,37 @@ def err_out(what="general", message="", obj=None, code=1):
         print(json.dumps(fulldump), file=sys.stderr)
     sys.exit(code)
 
+def model_info(args, base_url, headers):
+    r = safecall(base_url=f'{base_url}/v1/models', headers=headers, what='get')
+
+    try:
+        resp = r.json()
+        models = resp.get('data') or resp.get('models')
+        
+        for model in models:
+            if args.model == '':
+                print(model['id'])
+            elif args.model in [model['id'], '*']:
+                params = model.get('supported_parameters')
+                if params:
+                    if args.info:
+                        print(json.dumps(params))
+                    else:
+                        print(json.dumps(model))
+                    sys.exit(0)
+
+        if args.model != '':
+            r = safecall(base_url=f'{base_url}/api/show', req={"model":args.model}, headers=headers)
+            if args.info:
+                print(json.dumps(r.json().get('capabilities')))
+            else:
+                print(json.dumps(r.json()))
+
+        sys.exit(0)
+    except Exception as ex:
+        err_out(what="parsing", message=f"{base_url}/models is unparsable json: {ex}", obj=r.text, code=126)
+
+
 def tool_gen(res):
     for line in res.iter_lines():
         if line:
@@ -301,7 +341,16 @@ https://github.com/day50-dev/llcat""")
     if args.server_key:
         headers['Authorization'] = f'Bearer {args.server_key}'
 
+    # Model
+    if not args.model:
+        model_info(args, base_url, headers)
+
     # Prompt 
+    # 
+    # It's worth noting that we do the prompt AFTER the model because
+    # it will suck stdin. If someone is doing a models query it shouldn't
+    # consume the stdin tokens.
+    #
     cli_prompt = ' '.join(args.user_prompt) if args.user_prompt else ''
     stdin_prompt = sys.stdin.read() if select.select([sys.stdin], [], [], 0.0)[0] else ''
 
@@ -319,37 +368,8 @@ https://github.com/day50-dev/llcat""")
             print(prompt)
         sys.exit(0)
 
-    # Model
-    if not args.model or (len(prompt) == 0 and not args.conversation):
-        r = safecall(base_url=f'{base_url}/v1/models', headers=headers, what='get')
-
-        try:
-            resp = r.json()
-            models = resp.get('data') or resp.get('models')
-            
-            for model in models:
-                if args.model == '':
-                    print(model['id'])
-                elif args.model in [model['id'], '*']:
-                    params = model.get('supported_parameters')
-                    if params:
-                        if args.info:
-                            print(json.dumps(params))
-                        else:
-                            print(json.dumps(model))
-                        sys.exit(0)
-
-            if args.model != '':
-                r = safecall(base_url=f'{base_url}/api/show', req={"model":args.model}, headers=headers)
-                if args.info:
-                    print(json.dumps(r.json().get('capabilities')))
-                else:
-                    print(json.dumps(r.json()))
-
-            sys.exit(0)
-        except Exception as ex:
-            err_out(what="parsing", message=f"{base_url}/models is unparsable json: {ex}", obj=r.text, code=126)
-
+    if (len(prompt) == 0 and not args.conversation):
+        model_info(args, base_url, headers)
 
     # Conversation
     messages = safeopen(args.conversation, can_create=True) if args.conversation else []
