@@ -234,31 +234,44 @@ def err_out(what="general", message="", obj=None, code=1):
 
 def model_info(args, base_url, headers):
     r = safecall(base_url=f'{base_url}/v1/models', headers=headers, what='get')
+    res = []
+    splat = False
 
     try:
         resp = r.json()
         models = resp.get('data') or resp.get('models')
+
+        if '*' in args.model:
+            import fnmatch
+            splat = True
         
         for model in models:
-            if args.model == '':
-                print(model['id'])
-            elif args.model in [model['id'], '*']:
-                params = model.get('supported_parameters')
-                if params:
-                    if args.info:
-                        print(json.dumps(params))
-                    else:
-                        print(json.dumps(model))
-                    sys.exit(0)
+            if '*' in args.model and not fnmatch.fnmatch(model.get('id'), args.model):
+                continue
 
-        if args.model != '':
-            r = safecall(base_url=f'{base_url}/api/show', req={"model":args.model}, headers=headers)
-            if args.info:
-                print(json.dumps(r.json().get('capabilities')))
-            else:
-                print(json.dumps(r.json()))
+            if args.info or args.model in [model['id'], '*']:
+                params = model.get('supported_parameters')
+                if not params:
+                    r = safecall(base_url=f'{base_url}/api/show', req={"model":model.get('id')}, headers=headers)
+                    model_info = r.json()
+                    params = model_info.get('capabilities')
+                else:
+                    model_info = model
+
+                if args.info:
+                    res.append({'model': model['id'], 'supported_parameters': params})
+                else:
+                    res.append(model_info)
+
+            elif splat or args.model == '':
+                print(model['id'])
+
+
+        if len(res):
+            print(json.dumps(res))
 
         sys.exit(0)
+
     except Exception as ex:
         err_out(what="parsing", message=f"{base_url}/models is unparsable json: {ex}", obj=r.text, code=126)
 
