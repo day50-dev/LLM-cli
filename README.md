@@ -287,15 +287,16 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   -su, -u, --server_url SERVER_URL
-                        Server URL (e.g., http://::1:8080). Also supports MSA
-                        format
+                        Server URL (e.g., http://::1:8080). Also supports MSA format
   -sk, -k, --server_key SERVER_KEY
                         Server API key for authorization
   -m, --model [MODEL]   Model to use (or list models if no value)
   -s, --system SYSTEM   System prompt
   -c, --conversation CONVERSATION
-                        Conversation history file
-  -cr                   Do not write anything back to the conversation file
+                        Conversation history file (r/w)
+  -sc, --schema SCHEMA  Set a schema to force structured output
+  -cr, --conversationro CONVERSATIONRO
+                        The readonly conversation input (ro)
   -mf, --mcp_file MCP_FILE
                         MCP file to use
   -tf, --tool_file TOOL_FILE
