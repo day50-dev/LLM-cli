@@ -314,7 +314,7 @@ https://github.com/day50-dev/llcat""")
     parser.add_argument('-mf', '--mcp_file', help='MCP file to use')
     parser.add_argument('-tf', '--tool_file', help='JSON file with tool definitions')
     parser.add_argument('-pr', '--proto', help='Protocol to use (ollama, openai, auto)')
-    parser.add_argument('-ps', action='store_true', help='Currently running model (if supported)')
+    parser.add_argument('-ps', '--ps', action='store_true', help='Currently running model (if supported)')
     parser.add_argument('-tp', '--tool_program', help='Program to execute tool calls')
     parser.add_argument('-to', '--timeout', type=int, help='Timeout in seconds for the read')
     parser.add_argument('-a',  '--attach', action='append', help='Attach file(s)')
@@ -443,7 +443,7 @@ https://github.com/day50-dev/llcat""")
 
         req['response_format'] = {
             'type': 'json_schema',
-            'json_schema': schama
+            'json_schema': schema
         }
 
     if tools:
