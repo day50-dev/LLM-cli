@@ -270,8 +270,9 @@ Now it's your turn.
 
 ```shell
 usage: llcat [-h] [-su SERVER_URL] [-sk SERVER_KEY] [-m [MODEL]]
-             [-s SYSTEM] [-c CONVERSATION] [-cr] [-mf MCP_FILE]
-             [-tf TOOL_FILE] [-tp TOOL_PROGRAM] [-to TIMEOUT] [-a ATTACH]
+             [-s SYSTEM] [-c CONVERSATION] [-sc SCHEMA]
+             [-cr CONVERSATIONRO] [-mf MCP_FILE] [-tf TOOL_FILE]
+             [-pr PROTO] [-ps] [-tp TOOL_PROGRAM] [-to TIMEOUT] [-a ATTACH]
              [-bq BE_QUIET] [-nw] [--curlify] [--version] [--info [INFO]]
              [user_prompt ...]
 
@@ -287,7 +288,8 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   -su, -u, --server_url SERVER_URL
-                        Server URL (e.g., http://::1:8080). Also supports MSA format
+                        Server URL (e.g., http://::1:8080). Also supports MSA
+                        format
   -sk, -k, --server_key SERVER_KEY
                         Server API key for authorization
   -m, --model [MODEL]   Model to use (or list models if no value)
@@ -301,6 +303,8 @@ options:
                         MCP file to use
   -tf, --tool_file TOOL_FILE
                         JSON file with tool definitions
+  -pr, --proto PROTO    Protocol to use (ollama, openai, auto)
+  -ps, --ps             Currently running model (if supported)
   -tp, --tool_program TOOL_PROGRAM
                         Program to execute tool calls
   -to, --timeout TIMEOUT
