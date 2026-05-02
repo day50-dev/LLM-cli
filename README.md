@@ -69,6 +69,15 @@ All the abstraction without those pesky leaks.
 
 llcat's basic CLI parameters are also compatible with [Simon Willison's llm](https://github.com/simonw/llm).
 
+Here's some examples of how to use **llcat** as a building block for many common use-cases:
+
+ * [Transferrable Conversations](#example-transferrable-conversations)
+ * [Stateful Interaction](#example-adding-state)
+ * [Interactive Chat](#example-interactive-chat)
+ * [Structured Output](#example-structured-output)
+ * [Evals](#example-evals)
+ * [Tool Calling](#example-tool-calling)
+
 ## Example: Transferrable Conversations
 
 Because conversations, models and servers are decoupled, you can easily mix and match them at any time.
