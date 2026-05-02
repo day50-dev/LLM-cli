@@ -159,7 +159,17 @@ Our conversation loop can be invoked like
 
 Adding additional features is trivial.
 
+## Example: Structured Output
+
+Using the schema feature you can pass json in to enforce a schema. Try something like
+
+```shell
+$ llcat -u http://localhost:11434 -sc examples/schema.json "give me a person"
+```
+
+
 ## Example: Evals
+
 Running the same thing on multiple models and assessing the outcome is straight forward. Here we're using [ollama](https://ollama.com)
 
 ```shell
