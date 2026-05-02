@@ -314,8 +314,9 @@ https://github.com/day50-dev/llcat""")
     parser.add_argument('-mf', '--mcp_file', help='MCP file to use')
     parser.add_argument('-tf', '--tool_file', help='JSON file with tool definitions')
     parser.add_argument('-pr', '--proto', help='Protocol to use (ollama, openai, auto)')
+    parser.add_argument('-ps', action='store_true', help='Currently running model (if supported)')
     parser.add_argument('-tp', '--tool_program', help='Program to execute tool calls')
-    parser.add_argument('-to', '--timeout', type=int, default=5, help='Timeout in seconds for the read')
+    parser.add_argument('-to', '--timeout', type=int, help='Timeout in seconds for the read')
     parser.add_argument('-a',  '--attach', action='append', help='Attach file(s)')
     parser.add_argument('-bq', '--be_quiet', action='append', help='Make it shutup about things')
     parser.add_argument('-nw', '--no_wrap', action='store_true', help='Do not wrap inputs in <xml-like-syntax>')
@@ -352,6 +353,17 @@ https://github.com/day50-dev/llcat""")
     headers = {'Content-Type': 'application/json'}
     if args.server_key:
         headers['Authorization'] = f'Bearer {args.server_key}'
+
+    if args.ps:
+        res = safecall(base_url=f'{args.server_url}/api/ps', headers=headers, what="get")
+        if res:
+            try:
+                res_json = res.json()
+            except Exception as e:
+                err_out(what='response', message=str(e))
+
+            print(res.json().get('models'))
+        sys.exit(0)
 
     # Model
     if not args.model:
