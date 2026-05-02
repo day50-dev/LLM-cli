@@ -420,6 +420,20 @@ https://github.com/day50-dev/llcat""")
         'stream': True
     }
 
+    # schema construction
+    schema = None
+    if args.schema:
+        # see if it's a file or not:
+        if os.path.exists(args.schema):
+            schema = safeopen(args.schema)
+        else:
+            schema = json.loads(args.schema)
+
+        req['response_format'] = {
+            'type': 'json_schema',
+            'json_schema': schama
+        }
+
     if tools:
         req['tools'] = tools
 
