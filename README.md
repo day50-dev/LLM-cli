@@ -69,6 +69,8 @@ All the abstraction without those pesky leaks.
 
 llcat's basic CLI parameters are also compatible with [Simon Willison's llm](https://github.com/simonw/llm).
 
+## Examples
+
 Here's some examples of how to use **llcat** as a building block for many common use-cases:
 
  * [Transferrable Conversations](#example-transferrable-conversations)
