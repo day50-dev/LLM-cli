@@ -523,6 +523,12 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
     TIMEOUT = args.timeout
     base_url = None
 
+    # We support the format llcat <endpoint> <prompt> which is the simplest
+    # invocation allowed
+    if not args.server_url and len(args.user_prompt) > 1:
+        args.server_url = args.user_prompt[0]
+        args.user_prompt = args.user_prompt[1:]
+
     # Server and headers
     if args.server_url:
         server = stringfile(args.server_url)
@@ -533,6 +539,8 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
             lhs, rhs = server.split('#')
             params = parse_qs(rhs, keep_blank_values=True)
             args.model = params.get('m')[0]
+            # MAS 1.1
+            args.server_key = params.get('k')[0]
         else:
             lhs = server
 
