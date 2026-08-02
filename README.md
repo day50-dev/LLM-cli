@@ -72,19 +72,19 @@ There is no caching or state saved between runs. Everything gets surfaced and er
 ## Very Quick Start
 List the models on [OpenRouter](https://openrouter.ai):
 
-`uvx llcat -u openrouter.ai/api -m`
+`uvx llcat openrouter.ai/api -m`
 
 What about just the qwen ones?
 
-`uvx llcat -u openrouter.ai/api -m '*qwen3*'`
+`uvx llcat openrouter.ai/api -m '*qwen3*'`
 
 What about their capabilities in JSON?
 
-`uvx llcat -u openrouter.ai/api -m '*qwen3*' --info | jq .`
+`uvx llcat openrouter.ai/api -m '*qwen3*' --info | jq .`
 
 Sure. What about a different protocol, say ollama?
 
-`uvx llcat -u localhost:11434 -m '*qwen3*' --info | jq .`
+`uvx llcat localhost:11434 -m '*qwen3*' --info | jq .`
 
 All the abstraction without those pesky leaks.
 
@@ -331,7 +331,7 @@ Options with a [@] prefix can either be strings or paths to a file, curl style, 
 They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].field
 
 positional arguments:
-  [@]user_prompt        your prompt
+  [@]user_prompt        your prompt. If you omit the server_url, the first argument will be the server
 
 options:
   -h, --help            show this help message and exit
