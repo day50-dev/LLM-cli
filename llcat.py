@@ -195,7 +195,7 @@ def mcp_start(server_config):
 
         proc.stdin.write(json.dumps(msg) + '\n')
 
-    rpc("initialize", {"protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "llcat", "version": "1.0"}})
+    rpc("initialize", {"protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "llcat", "version": VERSION}})
     rpc("notifications/initialized")
 
     proc.stdin.flush()  
