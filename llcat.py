@@ -28,13 +28,19 @@ def create_content_with_attachments(text_prompt, attachment_list):
                 'type': 'image_url', 
                 'image_url': b64
             })
-        else:
+        elif mt and 'pdf' in mt:
             content.append({
                 "type": "file",
                 "file": {
                     "filename": file_path,
                     "file_data": b64
                 }
+            })
+    
+        else:
+            content.append({
+                "type": "text",
+                "text": f"\n\n--- File: {file_path} ---\n{file_data}"
             })
     
     if text_prompt:
