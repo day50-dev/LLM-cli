@@ -2,8 +2,14 @@
   "schema": {
     "type": "object",
     "properties": {
-      "name": { "type": "string" },
-      "age": { "type": "integer" }
+      "name": { 
+        "type": "string",
+        "description": "the name of the person"
+      },
+      "age": { 
+        "type": "integer",
+        "description": "the age of the person"
+      }
     },
     "required": ["name", "age"],
     "additionalProperties": false
