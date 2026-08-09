@@ -15,19 +15,28 @@ SESSION = None
 mcp_dict_ref = {}
 
 def create_content_with_attachments(text_prompt, attachment_list):
-    import base64, re
+    import base64, re, mimetypes
     content = []
     
     for file_path in attachment_list:
+        mt, _ = mimetypes.guess_type(file_path)
         file_data = safeopen(file_path, what='attachment', fmt='bin')
-        ext = os.path.splitext(file_path)[1].lower().lstrip('.')
-        prefix = "image" if re.match(r'((we|)bm?p|j?p[en]?g)', ext) else "application"
-        b64 = 'data:image/png;base64,' + base64.b64encode(file_data).decode('utf-8')
-        
-        content.append({
-            'type': 'image_url', #'document' if prefix == "application" else "image",
-            'image_url': b64
-        })
+        b64 = f'data:{mime_type or "application/octet-stream"};base64,' + base64.b64encode(file_data).decode('utf-8')
+
+        if mime_type and mime_type.startswith('image/'):
+            b64 = f'data:{mime_type};base64,' + base64.b64encode(file_data).decode('utf-8')
+            content.append({
+                'type': 'image_url', 
+                'image_url': b64
+            })
+        else:
+            content.append({
+                "type": "file",
+                "file": {
+                    "filename": file_path,
+                    "file_data": b64
+                }
+            })
     
     if text_prompt:
         content.append({
