@@ -21,10 +21,9 @@ def create_content_with_attachments(text_prompt, attachment_list):
     for file_path in attachment_list:
         mt, _ = mimetypes.guess_type(file_path)
         file_data = safeopen(file_path, what='attachment', fmt='bin')
-        b64 = f'data:{mime_type or "application/octet-stream"};base64,' + base64.b64encode(file_data).decode('utf-8')
+        b64 = f'data:{mt or "application/octet-stream"};base64,' + base64.b64encode(file_data).decode('utf-8')
 
-        if mime_type and mime_type.startswith('image/'):
-            b64 = f'data:{mime_type};base64,' + base64.b64encode(file_data).decode('utf-8')
+        if mt and mt.startswith('image/'):
             content.append({
                 'type': 'image_url', 
                 'image_url': b64
