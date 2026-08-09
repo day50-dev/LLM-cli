@@ -27,7 +27,6 @@ classifiers = [
 ]
 dependencies = [
     "requests",
-    "mimetypes",
     "curlify"
 ]
 
