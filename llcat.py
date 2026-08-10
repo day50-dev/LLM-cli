@@ -497,7 +497,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
     # We want to show things in the order of importance
     parser.add_argument('-su', '-u', '--server_url',        metavar='[@]SERVERURL', help='server URL (e.g., http://::1:8080). Also supports MAS format')
     parser.add_argument('-sk', '-k', '--server_key',        metavar='[@]SERVERKEY', help='server API key for authorization')
-    parser.add_argument('-to', '--timeout', type=float,     help='timeout in seconds for the read')
+    parser.add_argument('-to', '--timeout',     type=str,     help='timeout in seconds for the read')
     parser.add_argument('-pr', '--proto', default='auto',   help='protocol to use (ollama, llama.cpp, openai, auto)')
 
     parser.add_argument('-m',  '--model', metavar='[@]MODEL', nargs='?', const='', default='any', help='model to use (or list models if no value)')
@@ -537,6 +537,12 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
     if args.be_quiet: SHUTUP = set((','.join(args.be_quiet)).split(','))
     TIMEOUT = args.timeout
     base_url = None
+
+    if args.timeout:
+        try:
+            args.timeout = float(args.timeout)
+        except:
+            args.timeout = None
 
     # We support the format llcat <endpoint> <prompt> which is the simplest
     # invocation allowed
