@@ -5,8 +5,6 @@
 </p>
 <hr>
 
-*Note: Human written*
-
 Ever need to test if an inference endpoint is working or want to one-shot a model on a server? 
 
 Maybe you want to cycle through keys or models or benchmark a bank of IPs. Perhaps you want to orchestrate `N` queries across `M` models running on `P` servers and want to run the job in parallel without leaving any leaky state behind.
@@ -19,6 +17,7 @@ Existing tools require you to pick from a provider boutique and a small list of 
 Here's a screenshot to add a custom model provider to [goose](https://goose-docs.ai/). It asks you to manually supply the model list as a comma separate list. What a pain!
 
 Well, not with `llcat`, now it's easy!
+<img width="709" alt="model-example" src="https://github.com/user-attachments/assets/61614548-32dd-42f0-9ea9-c007cf632d52" />
 
 
 
