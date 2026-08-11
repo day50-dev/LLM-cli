@@ -15,7 +15,14 @@ Existing tools require you to pick from a provider boutique and a small list of 
 
 **llcat** is a solution to these problems: a general-purpose CLI-based OpenAI-compatible `/chat/completions` caller (and also works with Ollama, OpenRouter, sglang, llama.cpp and more). It has a rich syntax and supports a sophisticated set of features while keeping simple things easy. 
 
-Think of it like cURL or cat for LLMs: a stateless, transparent, explicit, low-level, composable tool for scripting and glue.
+## Example: model list
+Here's a screenshot to add a custom model provider to [goose](https://goose-docs.ai/). It asks you to manually supply the model list as a comma separate list. What a pain!
+
+Well, not with `llcat`, now it's easy!
+
+
+
+Think of `llcat` like cURL or cat for LLMs: a stateless, transparent, explicit, low-level, composable tool for scripting and glue.
 
 Conversations, keys, servers and other configurations are explicitly specified each execution as command line arguments. 
 
