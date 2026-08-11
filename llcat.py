@@ -11,8 +11,7 @@ DRY = False
 FORCE = False
 TIMEOUT = None
 SESSION = None
-
-mcp_dict_ref = {}
+MCP_REF = {}
 
 def create_content_with_attachments(text_prompt, attachment_list):
     import base64, re, mimetypes
@@ -276,7 +275,7 @@ def mcp_get_def(path):
     import re
     config = safeopen(path)
 
-    global mcp_dict_ref
+    global MCP_REF
     tool_return = []
     for server_name, server_config in config.get('mcpServers').items():
         if server_config.get("disabled"):
@@ -290,11 +289,11 @@ def mcp_get_def(path):
             base_name = f"{safe_name}_{tool['name']}"
             llm_tool_name = base_name
             
-            while llm_tool_name in mcp_dict_ref:
+            while llm_tool_name in MCP_REF:
                 llm_tool_name = f"{base_name}{counter}"
                 counter += 1
             
-            mcp_dict_ref[llm_tool_name] = (server_config, tool['name'])
+            MCP_REF[llm_tool_name] = (server_config, tool['name'])
             tool['name'] = llm_tool_name
             tool['parameters'] = tool['inputSchema']
             del tool['inputSchema']
@@ -474,7 +473,7 @@ def base_request(args, server):
     return req
 
 def main():
-    global SHUTUP, CURLIFY, VERSION, DRY, TIMEOUT, FORCE, mcp_dict_ref 
+    global SHUTUP, CURLIFY, VERSION, DRY, TIMEOUT, FORCE, MCP_REF
 
     try:
         VERSION = importlib.metadata.version('llcat')
@@ -546,7 +545,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
     # We support the format llcat <endpoint> <prompt> which is the simplest
     # invocation allowed
-    if not args.server_url and len(args.user_prompt) > 1:
+    if not args.server_url and len(args.user_prompt) > 0:
         args.server_url = args.user_prompt[0]
         args.user_prompt = args.user_prompt[1:]
 
@@ -567,10 +566,17 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
         base_url = lhs.rstrip('/').removesuffix('/v1')
         if "//" not in base_url: 
-            if 'localhost' in base_url:
-                base_url = "http://" + base_url
-            else:
-                base_url = "https://" + base_url
+            from ipaddress import ip_address
+            url_ = base_url.split(':')[0].strip()
+            schema = 'http'
+
+            try:
+                if url_.lower() != 'localhost':
+                    ip_address(url_)
+            except ValueError:
+                schema = 'https'
+
+            base_url = schema + "://" + base_url
 
     headers = {
         'Accept': 'text/event-stream' if not args.no_stream else 'application/json',
@@ -635,7 +641,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
         tools = safeopen(args.tool_file)
         for tool in tools:
             # we demand the tool program to be executable
-            mcp_dict_ref[tool['function']['name']] = ({'command':args.tool_program,'args':[]}, tool['function']['name'])
+            MCP_REF[tool['function']['name']] = ({'command':args.tool_program,'args':[]}, tool['function']['name'])
 
     if args.mcp:
         tools = tools or []
@@ -765,10 +771,10 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                 if args.tool_program and '/' not in args.tool_program:
                     args.tool_program = './' + args.tool_program
 
-                if fname not in mcp_dict_ref:
+                if fname not in MCP_REF:
                     err_out(what="toolcall", message=f"{fname} is not a tool")
 
-                config, name = mcp_dict_ref[fname]
+                config, name = MCP_REF[fname]
                 result = json.dumps( call_tool(config, name, tool_call['function']['arguments']))
 
                 if not set(['toolcall','debug','result']).intersection(SHUTUP):
