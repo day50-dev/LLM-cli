@@ -5,8 +5,6 @@
 </p>
 <hr>
 
-*Note: Human written*
-
 Ever need to test if an inference endpoint is working or want to one-shot a model on a server? 
 
 Maybe you want to cycle through keys or models or benchmark a bank of IPs. Perhaps you want to orchestrate `N` queries across `M` models running on `P` servers and want to run the job in parallel without leaving any leaky state behind.
@@ -16,15 +14,16 @@ Existing tools require you to pick from a provider boutique and a small list of 
 **llcat** is a solution to these problems: a general-purpose CLI-based OpenAI-compatible `/chat/completions` caller (and also works with Ollama, OpenRouter, sglang, llama.cpp and more). It has a rich syntax and supports a sophisticated set of features while keeping simple things easy. 
 
 ## Example: model list
-Here's a screenshot to add a custom model provider to [goose](https://goose-docs.ai/). It asks you to manually supply the model list as a comma separate list. What a pain!
+Here's a screenshot to add a custom model provider to [goose](https://goose-docs.ai/). It asks you to manually supply the models as a comma separate list. What a pain!
 
-Well, not with `llcat`, now it's easy!
+It's not a pain with `llcat`! It's easy!
+<img width="709" alt="model-example" src="https://github.com/user-attachments/assets/61614548-32dd-42f0-9ea9-c007cf632d52" />
 
 
 
 Think of `llcat` like cURL or cat for LLMs: a stateless, transparent, explicit, low-level, composable tool for scripting and glue.
 
-Conversations, keys, servers and other configurations are explicitly specified each execution as command line arguments. 
+Conversations, which are regular JSON files, keys, servers and other configurations are explicitly specified each execution as command line arguments. There's a `--curlify` option as well. 
 
 This makes building things with llcat direct.
 
@@ -70,11 +69,7 @@ Here's a pattern you might particularly like:
 llcat -k @~/secrets.json:.openrouter
 ```
 
-**llcat** is part of the [DAY50](https://day50.dev) suite of open-source tools built for a future where AI workloads are split across devices, private servers, and cloud APIs.
-   
-Conversations use regular JSON files through a principle of "least magic" - prioritizing predictability, compatibility, coherency, transparency and functionality.
-
-There is no caching or state saved between runs. Everything gets surfaced and errors are JSON parsable. There's a `--curlify` option as well. 
+**llcat** is part of the [DAY50](https://day50.dev) suite of open-source tools built for a future where AI workloads are split across devices, private servers, and cloud APIs prioritizing predictability, compatibility, coherency, transparency and functionality.
 
 ## Very Quick Start
 List the models on [OpenRouter](https://openrouter.ai):
