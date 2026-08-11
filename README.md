@@ -23,7 +23,7 @@ It's not a pain with `llcat`! It's easy!
 
 Think of `llcat` like cURL or cat for LLMs: a stateless, transparent, explicit, low-level, composable tool for scripting and glue.
 
-Conversations, keys, servers and other configurations are explicitly specified each execution as command line arguments. 
+Conversations, which are regular JSON files, keys, servers and other configurations are explicitly specified each execution as command line arguments. There's a `--curlify` option as well. 
 
 This makes building things with llcat direct.
 
@@ -69,11 +69,7 @@ Here's a pattern you might particularly like:
 llcat -k @~/secrets.json:.openrouter
 ```
 
-**llcat** is part of the [DAY50](https://day50.dev) suite of open-source tools built for a future where AI workloads are split across devices, private servers, and cloud APIs.
-   
-Conversations use regular JSON files through a principle of "least magic" - prioritizing predictability, compatibility, coherency, transparency and functionality.
-
-There is no caching or state saved between runs. Everything gets surfaced and errors are JSON parsable. There's a `--curlify` option as well. 
+**llcat** is part of the [DAY50](https://day50.dev) suite of open-source tools built for a future where AI workloads are split across devices, private servers, and cloud APIs prioritizing predictability, compatibility, coherency, transparency and functionality.
 
 ## Very Quick Start
 List the models on [OpenRouter](https://openrouter.ai):
