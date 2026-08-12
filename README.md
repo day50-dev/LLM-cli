@@ -100,7 +100,7 @@ There's that `@` again, this time providing completely portable invocations as J
 
 ---
 
-### Simple examples
+### Simple Examples
 
 List the models on [OpenRouter](https://openrouter.ai):
 
