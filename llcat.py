@@ -427,7 +427,7 @@ def stringfile(instr, MustExist=False):
 
 def base_request(args, server):
     try:
-        eb = json.loads(stringfile(args.extra_body))
+        eb = json.loads(stringfile(args.extra_body or "{}"))
     except Exception as ex:
         err_out(what="parsing", message=f"{args.extra_body} is unparsable json: {ex}", code=126)
 
@@ -509,7 +509,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
     parser.add_argument('-c',  '--conversation',    help='conversation history file (r/w)')
     parser.add_argument('-cr', '--conversationro',  help="the readonly conversation input (ro)")
 
-    parser.add_argument('-eb', '--extra_body',  metavar='[@]EXTRABODY', default='{}', help='JSON to add to the body, such as max_tokens or temperature')
+    parser.add_argument('-eb', '--extra_body',  metavar='[@]EXTRABODY', help='JSON to add to the body, such as max_tokens or temperature')
     parser.add_argument('-sc', '--schema',      metavar='[@]SCHEMA', help='set a schema to force structured output')
     parser.add_argument('-mf', '--mcp',    help='MCP file to use')
     parser.add_argument('-tp', '--tool_program', help='program to execute tool calls')
