@@ -1,7 +1,7 @@
 <p align="center">
 <img width="238" alt="llcat" src="https://github.com/user-attachments/assets/c161862d-8a8e-4753-a6eb-8a3b67f760b0" />
 <br/> <strong>/usr/bin/cat for LLMs</strong>
-<br/> <a href=https://pypi.org/project/llcat><img src=https://badge.fury.io/py/llcat.svg/></a>
+<br/> <a href=https://pypi.org/project/llcat><img src=https://badge.fury.io/py/llcat.svg/></a> <img src=https://img.shields.io/badge/License-MIT-yellow.svg />
 </p>
 <hr>
 
@@ -13,12 +13,18 @@ Existing tools require you to pick from a provider boutique and a small list of 
 
 **llcat** is a solution to these problems: a general-purpose CLI-based OpenAI-compatible `/chat/completions` caller (and also works with Ollama, OpenRouter, sglang, llama.cpp and more). It has a rich syntax and supports a sophisticated set of features while keeping simple things easy. 
 
-## Example: model list
-Here's a screenshot to add a custom model provider to [goose](https://goose-docs.ai/). It asks you to manually supply the models as a comma separate list. What a pain!
-
-It's not a pain with `llcat`! It's easy!
-<img width="709" alt="model-example" src="https://github.com/user-attachments/assets/61614548-32dd-42f0-9ea9-c007cf632d52" />
-
+> ### Example: Model List
+> Here's a screenshot from adding a custom model provider to [goose](https://goose-docs.ai/). It asks you to manually supply the models as a comma separate list. What a pain!
+> 
+> Not a pain with `llcat`! It's easy!
+>
+> <img width="709" alt="model-example" src="https://github.com/user-attachments/assets/61614548-32dd-42f0-9ea9-c007cf632d52" />
+>
+> Copy and paste this. Go ahead!
+>
+> ```shell
+> uvx llcat api.concentrate.ai -m | tr '\n' ','
+> ```
 
 
 Think of `llcat` like cURL or cat for LLMs: a stateless, transparent, explicit, low-level, composable tool for scripting and glue.
