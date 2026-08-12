@@ -90,7 +90,7 @@ Also note that opening parameter `--save invocation.json`. If you open `invocati
 }
 ```
 
-In the future you can just do
+So to re-invoke this set of parameters you can just do
 
 ```shell
 llcat @invocation.json
