@@ -317,15 +317,17 @@ There's ways of doing the network transports with this script as well. All you n
 Now it's your turn. 
 
 ```shell
-usage: llcat [-h] [-su [@]SERVERURL] [-sk [@]SERVERKEY] [-to TIMEOUT] [-pr PROTO] 
-             [-m [[@]MODEL]] [-s [@]SYSTEM] [-a ATTACH] [-c CONVERSATION] [-cr CONVERSATIONRO] 
-             [-eb [@]EXTRABODY] [-sc [@]SCHEMA] [-mf MCP] [-tp TOOL_PROGRAM] [-tf TOOL_FILE]
-             [-ps] [-bq BE_QUIET] [-nt] [-ns] [-nw] [-f] [--curlify] [--dry] [--version] [--info [INFO]]
+usage: llcat [-h] [-su [@]SERVERURL] [-sk [@]SERVERKEY] [-to TIMEOUT]
+             [-pr PROTO] [-m [[@]MODEL]] [-s [@]SYSTEM] [-a ATTACH]
+             [-c CONVERSATION] [-cr CONVERSATIONRO] [-eb [@]EXTRABODY]
+             [-sc [@]SCHEMA] [-mf MCP] [-tp TOOL_PROGRAM] [-tf TOOL_FILE]
+             [-ps] [-bq BE_QUIET] [-nt] [-ns] [-nw] [-f] [--curlify]
+             [--dry] [--version] [--info [INFO]] [--save SAVE]
              [[@]user_prompt ...]
 
-llcat is /usr/bin/cat for LLMs.
+llcat is /usr/bin/cat for LLMs. 
 
-        🐱 Me-wow!
+        🐱 Me-wow! 
 
 https://github.com/day50-dev/llcat
 
@@ -333,12 +335,14 @@ Options with a [@] prefix can either be strings or paths to a file, curl style, 
 They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].field
 
 positional arguments:
-  [@]user_prompt        your prompt. If you omit the server_url, the first argument will be the server
+  [@]user_prompt        your prompt. If you omit the server_url, the first
+                        argument will be the server
 
 options:
   -h, --help            show this help message and exit
   -su, -u, --server_url [@]SERVERURL
-                        server URL (e.g., http://::1:8080). Also supports MAS format
+                        server URL (e.g., http://::1:8080). Also supports MAS
+                        format
   -sk, -k, --server_key [@]SERVERKEY
                         server API key for authorization
   -to, --timeout TIMEOUT
@@ -354,7 +358,8 @@ options:
   -cr, --conversationro CONVERSATIONRO
                         the readonly conversation input (ro)
   -eb, --extra_body [@]EXTRABODY
-                        JSON to add to the body, such as max_tokens or temperature
+                        JSON to add to the body, such as max_tokens or
+                        temperature
   -sc, --schema [@]SCHEMA
                         set a schema to force structured output
   -mf, --mcp MCP        MCP file to use
@@ -373,6 +378,8 @@ options:
   --dry                 dry run
   --version             show program's version number and exit
   --info [INFO]         get the info for a model
+  --save SAVE           save an invocation to a reusable JSON file. Supply it
+                        as a bare @argument to reuse
 ```
 
 We're excited to see what you build.
