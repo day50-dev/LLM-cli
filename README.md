@@ -162,9 +162,9 @@ $ llcat -u "https://openrouter.ai/api#m=qwen/qwen3-4b:free"
         "And what about Canada?"
 ```
 
-And finish on the local network:
+And finish on the local network. As a convenience, we're going to skip the `-u` and drop the schema. `llcat` is smart enough to figure it out.
 ```
-$ llcat -u http://192.168.1.21:8080 \
+$ llcat 192.168.1.21:8080 \
         -c /tmp/convo.txt \
         "And what about Japan?"
 ```
