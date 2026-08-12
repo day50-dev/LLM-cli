@@ -379,7 +379,7 @@ def tool_gen(res):
     if isJSON:
         yield json.loads(data)
 
-def stringfile(instr):
+def stringfile(instr, MustExist=False):
     res = instr
     flag = False
     isJq = False
@@ -419,6 +419,9 @@ def stringfile(instr):
 
         if not flag:
             logging.warning(f"{instr} specified, it uses file syntax, however the file doesn't exist. Using it as a string.")
+
+            if MustExist:
+                return False
 
     return res
 
@@ -522,9 +525,30 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
     parser.add_argument('--dry',             action='store_true', help="dry run")
     parser.add_argument('--version',         action='version', version='%(prog)s ' + VERSION)
     parser.add_argument('--info',            nargs='?', const='caps', help='get the info for a model')
+    parser.add_argument('--save',            help='save an invocation to a resuable json file')
 
     parser.add_argument('user_prompt',       metavar='[@]user_prompt', nargs='*', help='your prompt. If you omit the server_url, the first argument will be the server')
     args = parser.parse_args()
+
+    # We support the format llcat <endpoint> <prompt> which is the simplest
+    # invocation allowed
+    if args.save:
+        with open(args.save, "w") as f:
+            d = vars(args)
+            d.pop('save', None)
+            json.dump(d, f)
+
+    if not args.server_url and len(args.user_prompt) > 0:
+        # this allows for shareable configs
+        if args.user_prompt[0].startswith('@'):
+            config = stringfile(args.user_prompt[0], MustExist=True)
+            if config:
+                config = json.loads(config)
+                for k,v in config.items():
+                    setattr(args, k, v)
+
+        args.server_url = args.user_prompt[0]
+        args.user_prompt = args.user_prompt[1:]
 
     if args.curlify:  CURLIFY = True
     if args.dry:      DRY = True
@@ -534,7 +558,6 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     if args.be_quiet: SHUTUP = set((','.join(args.be_quiet)).split(','))
-    TIMEOUT = args.timeout
     base_url = None
 
     if args.timeout:
@@ -543,11 +566,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
         except:
             args.timeout = None
 
-    # We support the format llcat <endpoint> <prompt> which is the simplest
-    # invocation allowed
-    if not args.server_url and len(args.user_prompt) > 0:
-        args.server_url = args.user_prompt[0]
-        args.user_prompt = args.user_prompt[1:]
+    TIMEOUT = args.timeout
 
     # Server and headers
     if args.server_url:
@@ -672,7 +691,8 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
     assistant = {
         'content': '',
         'reasoning': '',
-        'tool_calls': []
+        # empty list can cause bugs
+        # 'tool_calls': []
     }
 
     stopFlag = False
