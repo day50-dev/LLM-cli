@@ -76,7 +76,7 @@ Here's a JSON pattern you might particularly like:
 llcat -k @~/secrets.json:.openrouter
 ```
 
-Also note that opening parameter `--save invocation.json`. If you cat invocation.json you will now see:
+Also note that opening parameter `--save invocation.json`. If you open `invocation.json` you would see:
 
 ```json
 {
