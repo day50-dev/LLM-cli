@@ -96,7 +96,7 @@ So to re-invoke this set of parameters you can just do
 llcat @invocation.json
 ```
 
-There's that `@` again. Completely portable invocations as JSON.
+There's that `@` again, this time providing completely portable invocations as JSON.
 
 ---
 
