@@ -530,19 +530,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
     parser.add_argument('user_prompt',       metavar='[@]user_prompt', nargs='*', help='your prompt. If you omit the server_url, the first argument will be the server')
     args = parser.parse_args()
 
-    # We support the format llcat <endpoint> <prompt> which is the simplest
-    # invocation allowed
-    if args.save:
-        with open(args.save, "w") as f:
-            d = vars(args)
-            d.pop('save', None)
-            tosave = {}
-            for k,v in d.items():
-                if v:
-                    tosave[k] = v
-            json.dump(tosave, f)
-
-    if not args.server_url and len(args.user_prompt) > 0:
+    if len(args.user_prompt) > 0:
         # this allows for shareable configs
         if args.user_prompt[0].startswith('@'):
             config = stringfile(args.user_prompt[0], MustExist=True)
@@ -552,11 +540,23 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                     cval = getattr(args, k)
                     if not cval:
                         setattr(args, k, v)
-        else:
-            args.server_url = args.user_prompt[0]
+            args.user_prompt = args.user_prompt[1:]
 
-        # yes, we do this in both cases.
+    if not args.server_url and len(args.user_prompt) > 0:
+        args.server_url = args.user_prompt[0]
         args.user_prompt = args.user_prompt[1:]
+
+    # We support the format llcat <endpoint> <prompt> which is the simplest
+    # invocation allowed
+    # This is done SECOND to support the the pattern
+    #
+    # llcat @config { new params } --save { some other file }
+    #
+    if args.save:
+        with open(args.save, "w") as f:
+            d = vars(args)
+            d.pop('save', None)
+            json.dump({k:v for k,v in d.items() if v}, f)
 
     if args.curlify:  CURLIFY = True
     if args.dry:      DRY = True
@@ -784,11 +784,14 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
                 tc['function']['arguments'] = value
 
-            messages.append({
+            next_row = {
                 'role': 'assistant',
-                'content': assistant.get('content') or None,
-                'tool_calls': tool_call_list
-            })
+                'content': assistant.get('content') or None
+            }
+            if tool_call_list:
+                next_row['tool_calls'] = tool_call_list
+
+            messages.append(next_row)
 
             for tool_call in tool_call_list:
                 fname = tool_call['function']['name']
