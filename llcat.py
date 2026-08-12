@@ -502,7 +502,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
     parser.add_argument('-to', '--timeout',     type=str,     help='timeout in seconds for the read')
     parser.add_argument('-pr', '--proto', default='auto',   help='protocol to use (ollama, llama.cpp, openai, auto)')
 
-    parser.add_argument('-m',  '--model', metavar='[@]MODEL', nargs='?', const='', default='any', help='model to use (or list models if no value)')
+    parser.add_argument('-m',  '--model', metavar='[@]MODEL', nargs='?', help='model to use (or list models if no value)')
     parser.add_argument('-s',  '--system', metavar='[@]SYSTEM', help='system prompt')
     parser.add_argument('-a',  '--attach', action='append', help='attach file(s)')
 
@@ -536,7 +536,11 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
         with open(args.save, "w") as f:
             d = vars(args)
             d.pop('save', None)
-            json.dump(d, f)
+            tosave = {}
+            for k,v in d.items():
+                if v:
+                    tosave[k] = v
+            json.dump(tosave, f)
 
     if not args.server_url and len(args.user_prompt) > 0:
         # this allows for shareable configs
@@ -545,9 +549,13 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
             if config:
                 config = json.loads(config)
                 for k,v in config.items():
-                    setattr(args, k, v)
+                    cval = getattr(args, k)
+                    if not cval:
+                        setattr(args, k, v)
+        else:
+            args.server_url = args.user_prompt[0]
 
-        args.server_url = args.user_prompt[0]
+        # yes, we do this in both cases.
         args.user_prompt = args.user_prompt[1:]
 
     if args.curlify:  CURLIFY = True
