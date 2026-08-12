@@ -58,7 +58,8 @@ llcat -k sk-or-v1-ff24...
 You can do the same pattern with models, system prompts, queries, and servers. For instance:
 
 ```shell
-llcat -k "@~/credentials.txt:12" \
+llcat --save invocation.json \
+      -k "@~/credentials.txt:12" \
       -u "@settings.json:.[3].host" \
       -s "@system_prompts:8" \
       -m "@settings.json:.[3].model" \
@@ -69,15 +70,38 @@ llcat -k "@~/credentials.txt:12" \
 
 Yes! You can use normal strings (ex: `"abc"`), files (ex: `@abc.txt`) with line numbers (ex: `@abc.txt:1`) and even `jq` syntax (ex: `@abc.json:.server[0].url`). This makes parallel distributed execution painless.
 
-Here's a pattern you might particularly like:
+Here's a JSON pattern you might particularly like:
 
 ```shell
 llcat -k @~/secrets.json:.openrouter
 ```
 
-**llcat** is part of the [DAY50](https://day50.dev) suite of open-source tools built for a future where AI workloads are split across devices, private servers, and cloud APIs prioritizing predictability, compatibility, coherency, transparency and functionality.
+Also note that opening parameter `--save invocation.json`. If you cat invocation.json you will now see:
 
-## Very Quick Start
+```json
+{
+  "server_url": "@settings.json:.[3].host",
+  "server_key": "@~/credentials.txt:12",
+  "model": "@settings.json:.[3].model",
+  "system": "@system_prompts:8",
+  "user_prompt": [
+    "@query.txt:12"
+  ]
+}
+```
+
+In the future you can just do
+
+```shell
+llcat @invocation.json
+```
+
+There's that `@` again. Completely portable invocations as JSON.
+
+---
+
+### Simple examples
+
 List the models on [OpenRouter](https://openrouter.ai):
 
 `uvx llcat openrouter.ai/api -m`
@@ -101,6 +125,8 @@ There's also support for schemas, dry-runs, expressing the calls as raw curls, a
 The basic CLI parameters are compatible with [Simon Willison's llm](https://github.com/simonw/llm) which makes the transition a drop-in replacement. It's also faster than llm. Time it yourself. You'll see...
 
 There's even an included tool for sanely manipulating the JSONs of the conversations for context engineering.
+
+**llcat** is part of the [DAY50](https://day50.dev) suite of open-source tools built for a future where AI workloads are split across devices, private servers, and cloud APIs prioritizing predictability, compatibility, coherency, transparency and functionality.
 
 ## Examples
 
