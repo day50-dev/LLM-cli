@@ -319,20 +319,21 @@ def model_info(args, base_url, headers):
     r = safecall(base_url=f'{base_url}/v1/models', headers=headers, what='get')
     res = []
     splat = False
+    qmodel = args.model or ''
 
     try:
         resp = r.json()
         models = resp.get('data') or resp.get('models')
 
-        if '*' in args.model:
+        if '*' in qmodel:
             import fnmatch
             splat = True
         
         for model in models:
-            if '*' in args.model and not fnmatch.fnmatch(model.get('id'), args.model):
+            if '*' in qmodel and not fnmatch.fnmatch(model.get('id'), qmodel):
                 continue
 
-            if args.info or (args.model in [model['id'], '*'] and len(model['id'])):
+            if args.info or (qmodel in [model['id'], '*'] and len(model['id'])):
                 params = model.get('supported_parameters')
                 if not params:
                     r = safecall(base_url=f'{base_url}/api/show', req={"model":model.get('id')}, headers=headers)
@@ -346,7 +347,7 @@ def model_info(args, base_url, headers):
                 else:
                     res.append(model_info)
 
-            elif splat or args.model == '':
+            elif splat or qmodel == '':
                 print(model['id'])
 
 
@@ -383,7 +384,7 @@ def stringfile(instr, MustExist=False):
     res = instr
     flag = False
     isJq = False
-    if instr[0] == '@':
+    if instr[0] == '@' and len(instr[0]) > 1:
         maybefile = Path(instr[1:]).expanduser()
         if os.path.exists(maybefile):
             with open(maybefile, 'r') as f:
