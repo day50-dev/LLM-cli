@@ -384,7 +384,7 @@ def stringfile(instr, MustExist=False):
     res = instr
     flag = False
     isJq = False
-    if instr[0] == '@' and len(instr[0]) > 1:
+    if instr[0] == '@' and len(instr) > 1:
         maybefile = Path(instr[1:]).expanduser()
         if os.path.exists(maybefile):
             with open(maybefile, 'r') as f:
