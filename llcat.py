@@ -503,7 +503,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
     parser.add_argument('-to', '--timeout',     type=str,     help='timeout in seconds for the read')
     parser.add_argument('-pr', '--proto', default='auto',   help='protocol to use (ollama, llama.cpp, openai, auto)')
 
-    parser.add_argument('-m',  '--model', metavar='[@]MODEL', nargs='?', help='model to use (or list models if no value)')
+    parser.add_argument('-m',  '--model', default='_any_', metavar='[@]MODEL', nargs='?', help='model to use (or list models if no value)')
     parser.add_argument('-s',  '--system', metavar='[@]SYSTEM', help='system prompt')
     parser.add_argument('-a',  '--attach', action='append', help='attach file(s)')
 
