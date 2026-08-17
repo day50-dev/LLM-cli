@@ -807,10 +807,14 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                 'content': assistant.get('content') or None
             }
             if tool_call_list:
+                for i in tool_call_list:
+                    if i.get('function'):
+                        # This should be a string for some reason
+                        i['function']['arguments'] = json.dumps(i['function']['arguments'])
+
                 next_row['tool_calls'] = tool_call_list
 
             messages.append(next_row)
-            update_convo(args, messages, assistant)
 
             for tool_call in tool_call_list:
                 fname = tool_call['function']['name']
@@ -836,7 +840,6 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                     'tool_call_id': tool_call['id'],
                     'content': result
                 })
-                update_convo(args, messages, assistant)
             
             req = base_request(args, server)
             req['messages'] = messages
