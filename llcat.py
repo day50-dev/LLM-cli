@@ -476,6 +476,23 @@ def base_request(args, server):
 
     return req
 
+def update_convo(args, messages, assistant):
+    if args.conversation:
+        do_append = False
+        newline = {'role': 'assistant'}
+        for k,v in assistant.items():
+            if len(v):
+                newline[k] = v
+                do_append = True
+
+        if do_append:
+            messages.append(newline)
+            try:
+                with open(args.conversation, 'w') as f:
+                    json.dump(messages, f, indent=2)
+            except Exception as ex:
+                err_out(what="conversation", message=f"{args.conversation} is unwritable", obj=traceback.format_exc(), code=126)
+
 def main():
     global SHUTUP, CURLIFY, VERSION, DRY, TIMEOUT, FORCE, MCP_REF
 
@@ -793,6 +810,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                 next_row['tool_calls'] = tool_call_list
 
             messages.append(next_row)
+            update_convo(args, messages, assistant)
 
             for tool_call in tool_call_list:
                 fname = tool_call['function']['name']
@@ -818,6 +836,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                     'tool_call_id': tool_call['id'],
                     'content': result
                 })
+                update_convo(args, messages, assistant)
             
             req = base_request(args, server)
             req['messages'] = messages
@@ -827,21 +846,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
             if len(tool_call_list) == 0:
                 break
 
-        if args.conversation:
-            do_append = False
-            newline = {'role': 'assistant'}
-            for k,v in assistant.items():
-                if len(v):
-                    newline[k] = v
-                    do_append = True
-
-            if do_append:
-                messages.append(newline)
-                try:
-                    with open(args.conversation, 'w') as f:
-                        json.dump(messages, f, indent=2)
-                except Exception as ex:
-                    err_out(what="conversation", message=f"{args.conversation} is unwritable", obj=traceback.format_exc(), code=126)
+        update_convo(args, messages, assistant)
 
     except KeyboardInterrupt as ex:
         err_out(message=f"Keyboard interrupt")
