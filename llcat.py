@@ -804,7 +804,8 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
             next_row = {
                 'role': 'assistant',
-                'content': assistant.get('content') or None
+                # content nil is not allowed, empty string
+                'content': assistant.get('content') or ''
             }
             if tool_call_list:
                 for i in tool_call_list:
@@ -814,7 +815,8 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
                 next_row['tool_calls'] = tool_call_list
 
-            messages.append(next_row)
+                # I think this is right, only on tool calls but I'm not sure.
+                messages.append(next_row)
 
             for tool_call in tool_call_list:
                 fname = tool_call['function']['name']
