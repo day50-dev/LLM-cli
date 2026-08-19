@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "agent": {
+      "command": "python3",
+      "args": ["examples/agent-mcp/server.py"]
+    }
+  }
+}
