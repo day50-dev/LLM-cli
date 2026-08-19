@@ -11,7 +11,14 @@ Maybe you want to cycle through keys or models or benchmark a bank of IPs. Perha
 
 Existing tools require you to pick from a provider boutique and a small list of models shipped with the software then swap around credentials like you're Indiana Jones with a bag of sand.
 
+
+
 **llcat** is a solution to these problems: a general-purpose CLI-based OpenAI-compatible `/chat/completions` caller (and also works with Ollama, OpenRouter, sglang, llama.cpp and more). It has a rich syntax and supports a sophisticated set of features while keeping simple things easy. 
+
+It's also very flexible. Look at how easy it is to do agentic coding with it. Just a single command. No magic required.
+
+https://github.com/user-attachments/assets/a23dab58-e7d6-40aa-b595-5e9c895b073e
+
 
 > ### Example: Model List
 > Here's a screenshot from adding a custom model provider to [goose](https://goose-docs.ai/). It asks you to manually supply the models as a comma separate list. What a pain!
