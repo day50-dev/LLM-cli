@@ -6,7 +6,7 @@ function stream_parser() {
     jq -r '
         if .class == "toolcall" and .message == "request"
         then
-            "**" + .obj.function.name + ":**\n\n```bash"
+            "**" + .obj.function.name + ":**\n\n```shell\n"
             + (.obj.function.arguments | fromjson | to_entries
                | map("  \(.key): \(.value)") | join("\n")) +
 						"\n```\n"
