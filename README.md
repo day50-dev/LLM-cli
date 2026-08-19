@@ -13,9 +13,11 @@ Existing tools require you to pick from a provider boutique and a small list of 
 
 
 
-**llcat** is a solution to these problems: a general-purpose CLI-based OpenAI-compatible `/chat/completions` caller (and also works with Ollama, OpenRouter, sglang, llama.cpp and more). It has a rich syntax and supports a sophisticated set of features while keeping simple things easy. 
+**llcat** is a solution to these problems: a general-purpose CLI-based OpenAI-compatible `/chat/completions` caller. It also works with Ollama, OpenRouter, sglang, vllm, llama.cpp and more. 
 
-It's also very flexible. Look at how easy it is to do agentic coding with it. Just a single command. No magic required.
+It has a rich syntax and supports a sophisticated set of features while keeping simple things easy. 
+
+**llcat** is flexible. Look at how it can do agentic coding in just a single command.
 
 https://github.com/user-attachments/assets/a23dab58-e7d6-40aa-b595-5e9c895b073e
 
