@@ -138,6 +138,7 @@ Here's some examples of how to use **llcat** as a building block for many common
  * [Structured Output](#example-structured-output)
  * [Evals](#example-evals)
  * [Tool Calling](#example-tool-calling)
+ * [Agentic Coding](#example-agentic-coding)
 
 ## Example: Transferrable Conversations
 
@@ -279,6 +280,23 @@ Would you like to play any of these? Just share the filename, and I can play it 
 In this example you can see how nothing is hidden so if the model makes a mistake it is immediately identifiable. 
 
 The debug JSON objects are sent to `stderr` so routing it separately is trivial.
+
+## Example: Agentic Coding
+Using the examples above we can conbine them and get an agentic harness on the cheap:
+
+```shell
+$ examples/conversation.sh \
+    -s "you are an agentic coder." \
+    -u 'localhost:11434#m=qwen3.8' \
+    -mf examples/agent-mcp/mcp.json
+
+  Using: /tmp/tmp.AZHfLtoGbZ
+
+  >> let's make towers of hanoi in perl
+  ...
+```
+
+And there's a coding agent... really ...
 
 ## MCP
 
