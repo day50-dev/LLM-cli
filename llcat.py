@@ -727,6 +727,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
         while True:
             r = safecall(f'{base_url}/v1/chat/completions', req, headers)
             tool_call_list = []
+            tool_call_dict = {}
 
             is_thinking = False
             for chunk in tool_gen(r):
@@ -781,16 +782,15 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                     
                     if tool_calls:
                         for tc in tool_calls:
-                            idx = tc.get('index', 0)
-                            if idx >= len(tool_call_list):
-                                tool_call_list.append({'id': '', 'type': 'function', 'function': {'name': '', 'arguments': ''}})
-                            
-                            if 'id' in tc:
-                                tool_call_list[idx]['id'] = tc['id']
+                            id = tc.get('id', '0')
+
+                            if id not in tool_call_dict:
+                                tool_call_dict[id] = {'id': id, 'type': 'function', 'function': {'name': '', 'arguments': ''}}
+
                             if 'function' in tc:
                                 for arg in ['name', 'arguments']:
                                     if arg in tc['function']:
-                                        tool_call_list[idx]['function'][arg] += tc['function'][arg]
+                                        tool_call_dict[id]['function'][arg] += tc['function'][arg]
 
                     if stopFlag == True:
                         stopFlag = False
@@ -798,6 +798,8 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
                 except Exception as ex:
                     err_out(what="toolcall", message=traceback.format_exc(), obj=req)
+
+            tool_call_list = list(tool_call_dict.values())
 
             for tc in tool_call_list:
                 value = tc['function']['arguments']
