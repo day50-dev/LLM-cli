@@ -11,7 +11,16 @@ Maybe you want to cycle through keys or models or benchmark a bank of IPs. Perha
 
 Existing tools require you to pick from a provider boutique and a small list of models shipped with the software then swap around credentials like you're Indiana Jones with a bag of sand.
 
-**llcat** is a solution to these problems: a general-purpose CLI-based OpenAI-compatible `/chat/completions` caller (and also works with Ollama, OpenRouter, sglang, llama.cpp and more). It has a rich syntax and supports a sophisticated set of features while keeping simple things easy. 
+
+
+**llcat** is a solution to these problems: a general-purpose CLI-based OpenAI-compatible `/chat/completions` caller. It also works with Ollama, OpenRouter, sglang, vllm, llama.cpp and more. 
+
+It has a rich syntax and supports a sophisticated set of features while keeping simple things easy. 
+
+**llcat** is flexible. Look at how it can do agentic coding in just a single command.
+
+https://github.com/user-attachments/assets/a23dab58-e7d6-40aa-b595-5e9c895b073e
+
 
 > ### Example: Model List
 > Here's a screenshot from adding a custom model provider to [goose](https://goose-docs.ai/). It asks you to manually supply the models as a comma separate list. What a pain!
@@ -138,6 +147,7 @@ Here's some examples of how to use **llcat** as a building block for many common
  * [Structured Output](#example-structured-output)
  * [Evals](#example-evals)
  * [Tool Calling](#example-tool-calling)
+ * [Agentic Coding](#example-agentic-coding)
 
 ## Example: Transferrable Conversations
 
@@ -279,6 +289,23 @@ Would you like to play any of these? Just share the filename, and I can play it 
 In this example you can see how nothing is hidden so if the model makes a mistake it is immediately identifiable. 
 
 The debug JSON objects are sent to `stderr` so routing it separately is trivial.
+
+## Example: Agentic Coding
+Using the examples above we can conbine them and get an agentic harness on the cheap:
+
+```shell
+$ examples/conversation.sh \
+    -s "you are an agentic coder." \
+    -u 'localhost:11434#m=qwen3.8' \
+    -mf examples/agent-mcp/mcp.json
+
+  Using: /tmp/tmp.AZHfLtoGbZ
+
+  >> let's make towers of hanoi in perl
+  ...
+```
+
+And there's a coding agent... really ...
 
 ## MCP
 

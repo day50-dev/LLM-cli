@@ -529,17 +529,18 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
     parser.add_argument('-eb', '--extra_body',  metavar='[@]EXTRABODY', help='JSON to add to the body, such as max_tokens or temperature')
     parser.add_argument('-sc', '--schema',      metavar='[@]SCHEMA', help='set a schema to force structured output')
-    parser.add_argument('-mf', '--mcp',    help='MCP file to use')
-    parser.add_argument('-tp', '--tool_program', help='program to execute tool calls')
-    parser.add_argument('-tf', '--tool_file',   help='JSON file with tool definitions')
+    parser.add_argument('-mf', '--mcp',           help='MCP file to use')
+    parser.add_argument('-tp', '--tool_program',  help='program to execute tool calls')
+    parser.add_argument('-tf', '--tool_file',     help='JSON file with tool definitions')
 
     parser.add_argument('-ps', '--ps',       action='store_true', help='currently running model (if supported)')
     parser.add_argument('-bq', '--be_quiet', action='append',     help='make it shutup about things')
     parser.add_argument('-nt', '--no_think', action="store_true", help='disable thinking')
     parser.add_argument('-ns', '--no_stream',action="store_true", help='disable streaming')
     parser.add_argument('-nw', '--no_wrap',  action='store_true', help='do not wrap inputs in <xml-like-syntax>')
-    parser.add_argument('-f',  '--force',     action='store_true', help='disable SSL verification')
+    parser.add_argument('-f',  '--force',    action='store_true', help='disable SSL verification')
     parser.add_argument('--curlify',         action='store_true', help="write curl equivalents of calls to stdout")
+    parser.add_argument('--raw',             action='store_true', help="raw version to the screen")
     parser.add_argument('--dry',             action='store_true', help="dry run")
     parser.add_argument('--version',         action='version', version='%(prog)s ' + VERSION)
     parser.add_argument('--info',            nargs='?', const='caps', help='get the info for a model')
@@ -726,9 +727,12 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
         while True:
             r = safecall(f'{base_url}/v1/chat/completions', req, headers)
             tool_call_list = []
+            tool_call_dict = {}
 
             is_thinking = False
             for chunk in tool_gen(r):
+                if args.raw:
+                    print(chunk)
                 try:
                     if 'choices' not in chunk:
                         err_out(what="parser", message="Unparsable content", obj={'req':req, 'res':chunk})
@@ -758,32 +762,35 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
                     if (len(assistant.get('reasoning', '')) > 0 or len(reasoning.strip())) and not 'think' in SHUTUP and reasoning:
                         if not is_thinking:
-                            print("<think>")
+                            if not args.raw:
+                                print("<think>")
                             is_thinking = True
 
                         assistant['reasoning'] += reasoning
-                        print(reasoning, end='', flush=True)
+                        if not args.raw:
+                            print(reasoning, end='', flush=True)
 
                     elif content:
                         if is_thinking:
-                            print("\n</think>")
+                            if not args.raw:
+                                print("\n</think>")
                             is_thinking = False
 
-                        print(content, end='', flush=True)
+                        if not args.raw:
+                            print(content, end='', flush=True)
                         assistant['content'] += content
                     
                     if tool_calls:
                         for tc in tool_calls:
-                            idx = tc.get('index', 0)
-                            if idx >= len(tool_call_list):
-                                tool_call_list.append({'id': '', 'type': 'function', 'function': {'name': '', 'arguments': ''}})
-                            
-                            if 'id' in tc:
-                                tool_call_list[idx]['id'] = tc['id']
+                            id = tc.get('id', '0')
+
+                            if id not in tool_call_dict:
+                                tool_call_dict[id] = {'id': id, 'type': 'function', 'function': {'name': '', 'arguments': ''}}
+
                             if 'function' in tc:
                                 for arg in ['name', 'arguments']:
                                     if arg in tc['function']:
-                                        tool_call_list[idx]['function'][arg] += tc['function'][arg]
+                                        tool_call_dict[id]['function'][arg] += tc['function'][arg]
 
                     if stopFlag == True:
                         stopFlag = False
@@ -791,6 +798,8 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
                 except Exception as ex:
                     err_out(what="toolcall", message=traceback.format_exc(), obj=req)
+
+            tool_call_list = list(tool_call_dict.values())
 
             for tc in tool_call_list:
                 value = tc['function']['arguments']
@@ -804,7 +813,8 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
             next_row = {
                 'role': 'assistant',
-                'content': assistant.get('content') or None
+                # content nil is not allowed, empty string
+                'content': assistant.get('content') or ''
             }
             if tool_call_list:
                 for i in tool_call_list:
@@ -814,7 +824,8 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
                 next_row['tool_calls'] = tool_call_list
 
-            messages.append(next_row)
+                # I think this is right, only on tool calls but I'm not sure.
+                messages.append(next_row)
 
             for tool_call in tool_call_list:
                 fname = tool_call['function']['name']
