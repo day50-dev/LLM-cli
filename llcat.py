@@ -540,7 +540,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
     parser.add_argument('-nw', '--no_wrap',  action='store_true', help='do not wrap inputs in <xml-like-syntax>')
     parser.add_argument('-f',  '--force',    action='store_true', help='disable SSL verification')
     parser.add_argument('--curlify',         action='store_true', help="write curl equivalents of calls to stdout")
-    parser.add_argument('--raw',             action='store_true', help="raw version to the screen")
+    parser.add_argument('--raw',             action='store_true', help="raw responses")
     parser.add_argument('--dry',             action='store_true', help="dry run")
     parser.add_argument('--version',         action='version', version='%(prog)s ' + VERSION)
     parser.add_argument('--info',            nargs='?', const='caps', help='get the info for a model')

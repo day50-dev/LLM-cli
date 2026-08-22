@@ -435,6 +435,7 @@ options:
   -f, --force           disable SSL verification
   --curlify             write curl equivalents of calls to stdout
   --dry                 dry run
+  --raw                 raw responses
   --version             show program's version number and exit
   --info [INFO]         get the info for a model
   --save SAVE           save an invocation to a reusable JSON file. Supply it
