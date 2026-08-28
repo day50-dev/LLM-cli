@@ -842,10 +842,10 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                 fname = tool_call['function']['name']
                 
                 if MD_TOOLS:
-                    fn = tool_call.get('function')
-                    if fn:
-                        print(f"\n###{fn.get('name')}")
-                        show(fn.get('arguments'))
+                    fn_ = tool_call.get('function')
+                    if fn_:
+                        print(f"\n###{fn_.get('name')}")
+                        show(fn_.get('arguments'))
 
                 elif not set(['toolcall','debug','request']).intersection(SHUTUP):
                     print(json.dumps({'level':'debug', 'class': 'toolcall', 'message': 'request', 'obj': tool_call}), file=sys.stderr)
