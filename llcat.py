@@ -477,6 +477,14 @@ def base_request(args, server):
 
     return req
 
+def show(obj):
+    _res = maybejson(obj)
+    if isinstance(_res, dict):
+        for key, val in _res.items():
+            print(f"* {key}: {val}")
+    else:
+        print(_res)
+
 def update_convo(args, messages, assistant):
     if args.conversation:
         do_append = False
@@ -495,7 +503,7 @@ def update_convo(args, messages, assistant):
                 err_out(what="conversation", message=f"{args.conversation} is unwritable", obj=traceback.format_exc(), code=126)
 
 def main():
-    global SHUTUP, CURLIFY, VERSION, DRY, TIMEOUT, FORCE, MCP_REF, MT_TOOLS
+    global SHUTUP, CURLIFY, VERSION, DRY, TIMEOUT, FORCE, MCP_REF, MD_TOOLS
 
     try:
         VERSION = importlib.metadata.version('llcat')
@@ -836,10 +844,9 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                 if MD_TOOLS:
                     fn = tool_call.get('function')
                     if fn:
-                        args = json.loads(fn.get('arguments'))
-                        print(f"###{fn.get('name')}")
-                        for key,val in args.items():
-                            print(f"* {key}: {val}")
+                        print(f"\n###{fn.get('name')}")
+                        show(fn.get('arguments'))
+
                 elif not set(['toolcall','debug','request']).intersection(SHUTUP):
                     print(json.dumps({'level':'debug', 'class': 'toolcall', 'message': 'request', 'obj': tool_call}), file=sys.stderr)
                 
@@ -852,7 +859,10 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                 config, name = MCP_REF[fname]
                 result = json.dumps( call_tool(config, name, tool_call['function']['arguments']))
 
-                if not set(['toolcall','debug','result']).intersection(SHUTUP):
+                if MD_TOOLS:
+                    show(result)
+
+                elif not set(['toolcall','debug','result']).intersection(SHUTUP):
                     print(json.dumps({'level':'debug', 'class': 'toolcall', 'message': 'result', 'obj': maybejson(result)}), file=sys.stderr)
                 
                 messages.append({
