@@ -11,6 +11,7 @@ DRY = False
 FORCE = False
 TIMEOUT = None
 SESSION = None
+MD_TOOLS = False
 MCP_REF = {}
 
 def create_content_with_attachments(text_prompt, attachment_list):
@@ -494,7 +495,7 @@ def update_convo(args, messages, assistant):
                 err_out(what="conversation", message=f"{args.conversation} is unwritable", obj=traceback.format_exc(), code=126)
 
 def main():
-    global SHUTUP, CURLIFY, VERSION, DRY, TIMEOUT, FORCE, MCP_REF
+    global SHUTUP, CURLIFY, VERSION, DRY, TIMEOUT, FORCE, MCP_REF, MT_TOOLS
 
     try:
         VERSION = importlib.metadata.version('llcat')
@@ -535,6 +536,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
     parser.add_argument('-ps', '--ps',       action='store_true', help='currently running model (if supported)')
     parser.add_argument('-bq', '--be_quiet', action='append',     help='make it shutup about things')
+    parser.add_argument('-mt', '--md_tools', action='store_true', help='make tool call output markdown')
     parser.add_argument('-nt', '--no_think', action="store_true", help='disable thinking')
     parser.add_argument('-ns', '--no_stream',action="store_true", help='disable streaming')
     parser.add_argument('-nw', '--no_wrap',  action='store_true', help='do not wrap inputs in <xml-like-syntax>')
@@ -578,6 +580,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
     if args.curlify:  CURLIFY = True
     if args.dry:      DRY = True
+    if args.md_tools: MD_TOOLS = True
     if args.force:
         FORCE = True
         import urllib3
@@ -821,7 +824,14 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
             for tool_call in tool_call_list:
                 fname = tool_call['function']['name']
                 
-                if not set(['toolcall','debug','request']).intersection(SHUTUP):
+                if MD_TOOLS:
+                    fn = tool_call.get('function')
+                    if fn:
+                        args = json.loads(fn.get('arguments'))
+                        print(f"###{fn.get('name')}")
+                        for key,val in args.items():
+                            print(f"* {key}: {val}")
+                elif not set(['toolcall','debug','request']).intersection(SHUTUP):
                     print(json.dumps({'level':'debug', 'class': 'toolcall', 'message': 'request', 'obj': tool_call}), file=sys.stderr)
                 
                 if args.tool_program and '/' not in args.tool_program:
