@@ -481,9 +481,9 @@ def show(obj):
     _res = maybejson(obj)
     if isinstance(_res, dict):
         for key, val in _res.items():
-            print(f"* {key}: {val}")
+            print(f"* {key}: {val}", flush=True)
     else:
-        print(_res)
+        print(_res, flush=True)
 
 def update_convo(args, messages, assistant):
     if args.conversation:

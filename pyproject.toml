@@ -27,7 +27,8 @@ classifiers = [
 ]
 dependencies = [
     "requests",
-    "curlify"
+    "curlify",
+    "jq"
 ]
 
 [project.optional-dependencies]
