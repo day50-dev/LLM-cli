@@ -11,7 +11,7 @@ DRY = False
 FORCE = False
 TIMEOUT = None
 SESSION = None
-MD_TOOLS = False
+LOGSTYLE = None
 MCP_REF = {}
 
 def create_content_with_attachments(text_prompt, attachment_list):
@@ -273,7 +273,6 @@ def call_tool(server_config, tool_name, arguments):
     return mcp_finish(proc)
 
 def mcp_get_def(path):
-    import re
     config = safeopen(path)
 
     global MCP_REF
@@ -303,18 +302,47 @@ def mcp_get_def(path):
 
     return tool_return
         
-def err_out(what="general", message="", obj=None, code=1):
-    if not set(['error',what]).intersection(SHUTUP):
+def err_out(what="general", message="", obj=None, code=1, exit=True):
+    level = 'error'
+    if not exit:
+        level = 'info'
+
+    if not set([level,what]).intersection(SHUTUP):
         obj_json = obj
         try:
             if isinstance(obj, str):
                 obj_json = json.dumps(obj)
         except:
             obj_json = obj
-        fulldump={'data': obj_json, 'level': 'error', 'class': what, 'message': message, 'tb': traceback.format_exc()}
 
-        print(json.dumps(fulldump), file=sys.stderr)
-    sys.exit(code)
+        tb = traceback.format_exc()
+
+        
+        fulldump={'data': obj_json, 'level': level, 'class': what, 'message': message, 'tb': tb}
+
+
+        # print(fulldump)
+        if LOGSTYLE == 'md':
+            if what == 'toolcall':
+                if message == 'request':
+                    out=f'> **{obj_json.get('function').get('name')}**' + f'\n{json.dumps(obj_json.get('function').get('arguments'))}'
+
+                elif message == 'result':
+                    out = f'>\n**result:**\n{json.dumps(obj_json, indent=2)}\n'
+
+                out = '\n> '.join(out.split('\n'))
+                print(out)
+
+            # this is an error message
+            else:
+                print(f'```python\n{tb}\n```')
+                print(f"###### {message}*\n")
+
+        else:
+            print(json.dumps(fulldump), file=sys.stderr)
+
+    if exit:
+      sys.exit(code)
 
 def model_info(args, base_url, headers):
     r = safecall(base_url=f'{base_url}/v1/models', headers=headers, what='get')
@@ -477,14 +505,6 @@ def base_request(args, server):
 
     return req
 
-def show(obj):
-    _res = maybejson(obj)
-    if isinstance(_res, dict):
-        for key, val in _res.items():
-            print(f"* {key}: {val}", flush=True)
-    else:
-        print(_res, flush=True)
-
 def update_convo(args, messages, assistant):
     if args.conversation:
         do_append = False
@@ -503,7 +523,7 @@ def update_convo(args, messages, assistant):
                 err_out(what="conversation", message=f"{args.conversation} is unwritable", obj=traceback.format_exc(), code=126)
 
 def main():
-    global SHUTUP, CURLIFY, VERSION, DRY, TIMEOUT, FORCE, MCP_REF, MD_TOOLS
+    global SHUTUP, CURLIFY, VERSION, DRY, TIMEOUT, FORCE, MCP_REF, LOGSTYLE
 
     try:
         VERSION = importlib.metadata.version('llcat')
@@ -541,6 +561,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
     parser.add_argument('-mf', '--mcp',           help='MCP file to use')
     parser.add_argument('-tp', '--tool_program',  help='program to execute tool calls')
     parser.add_argument('-tf', '--tool_file',     help='JSON file with tool definitions')
+    parser.add_argument('-l', '--logstyle', default='md', choices=['md','json'], help='logging style')
 
     parser.add_argument('-ps', '--ps',       action='store_true', help='currently running model (if supported)')
     parser.add_argument('-bq', '--be_quiet', action='append',     help='make it shutup about things')
@@ -589,7 +610,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
     if args.curlify:  CURLIFY = True
     if args.dry:      DRY = True
-    if args.md_tools: MD_TOOLS = True
+    if args.logstyle: LOGSTYLE = args.logstyle
     if args.force:
         FORCE = True
         import urllib3
@@ -741,6 +762,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
             tool_call_dict = {}
 
             is_thinking = False
+            tool_id = 0
             for chunk in tool_gen(r):
                 if args.raw:
                     print(chunk)
@@ -759,7 +781,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                         # we asked for streaming but it told us to go fuck ourselves
                         if not args.no_stream:
                             if not 'stream' in SHUTUP:
-                                print(json.dumps({'level':'warn', 'class': 'stream', 'message': 'Streaming requested. Non-streaming result returned'}), file=sys.stderr)
+                                err_out('stream', 'Streaming requested. Non-streaming result returned', exit=False)
 
                         content = chunk['choices'][0]['message']['content']
                         tool_calls = []
@@ -791,17 +813,19 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                             print(content, end='', flush=True)
                         assistant['content'] += content
                     
+                    # so some models keep the id consistent for partials and others just
+                    # send a 0 down the pipe to mean "same as last time". 
                     if tool_calls:
                         for tc in tool_calls:
-                            id = tc.get('id', '0')
+                            tool_id = tc.get('id',tool_id)
 
-                            if id not in tool_call_dict:
-                                tool_call_dict[id] = {'id': id, 'type': 'function', 'function': {'name': '', 'arguments': ''}}
+                            if tool_id not in tool_call_dict:
+                                tool_call_dict[tool_id] = {'id': tool_id, 'type': 'function', 'function': {'name': '', 'arguments': ''}}
 
                             if 'function' in tc:
                                 for arg in ['name', 'arguments']:
                                     if arg in tc['function']:
-                                        tool_call_dict[id]['function'][arg] += tc['function'][arg]
+                                        tool_call_dict[tool_id]['function'][arg] += tc['function'][arg]
 
                     if stopFlag == True:
                         stopFlag = False
@@ -812,6 +836,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
 
             tool_call_list = list(tool_call_dict.values())
 
+            # this is the calling, after the construction is ostensibly done
             for tc in tool_call_list:
                 value = tc['function']['arguments']
                 if isinstance(value, str):
@@ -831,7 +856,12 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                 for i in tool_call_list:
                     if i.get('function'):
                         # This should be a string for some reason
-                        i['function']['arguments'] = json.dumps(i['function']['arguments'])
+                        l_args = i['function']['arguments']
+                        if not isinstance(l_args, str):
+                            l_args = json.dumps(l_args)
+
+                        else:
+                            i['function']['arguments'] += l_args
 
                 next_row['tool_calls'] = tool_call_list
 
@@ -841,14 +871,8 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
             for tool_call in tool_call_list:
                 fname = tool_call['function']['name']
                 
-                if MD_TOOLS:
-                    fn_ = tool_call.get('function')
-                    if fn_:
-                        print(f"\n###{fn_.get('name')}")
-                        show(fn_.get('arguments'))
-
-                elif not set(['toolcall','debug','request']).intersection(SHUTUP):
-                    print(json.dumps({'level':'debug', 'class': 'toolcall', 'message': 'request', 'obj': tool_call}), file=sys.stderr)
+                if not set(['toolcall','debug','request']).intersection(SHUTUP):
+                    err_out('toolcall', 'request', tool_call, exit=False)
                 
                 if args.tool_program and '/' not in args.tool_program:
                     args.tool_program = './' + args.tool_program
@@ -859,11 +883,8 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
                 config, name = MCP_REF[fname]
                 result = json.dumps( call_tool(config, name, tool_call['function']['arguments']))
 
-                if MD_TOOLS:
-                    show(result)
-
-                elif not set(['toolcall','debug','result']).intersection(SHUTUP):
-                    print(json.dumps({'level':'debug', 'class': 'toolcall', 'message': 'result', 'obj': maybejson(result)}), file=sys.stderr)
+                if not set(['toolcall','debug','result']).intersection(SHUTUP):
+                    err_out('toolcall', 'result', maybejson(result), exit=False)
                 
                 messages.append({
                     'role': 'tool',
