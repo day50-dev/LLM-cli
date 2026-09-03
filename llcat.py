@@ -693,6 +693,7 @@ They can also have line numbers @/like/this:0 or jq syntax @/like/this:.[0].fiel
         cli_prompt = stringfile(' '.join(args.user_prompt))
 
 
+    sys.stdin.reconfigure(errors='replace')
     stdin_prompt = sys.stdin.read() if select.select([sys.stdin], [], [], 0.0)[0] else ''
 
     if (not args.no_wrap) and len(stdin_prompt) and len(cli_prompt):
