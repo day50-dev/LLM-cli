@@ -271,7 +271,7 @@ Try this to see what that looks like
 The examples directory contains this [music playing tool](https://github.com/day50-dev/llcat/blob/main/examples/tool_program.py) listing the contents of [this album](https://elektrobopacek.bandcamp.com/album/untitled): 
 
 ```shell
-$ llcat -u http://127.1:8080 -tf tool_file.json -tp tool_program.py "what mp3s do i have in my ~/mp3 directory"
+$ llcat -l json -u http://127.1:8080 -tf tool_file.json -tp tool_program.py "what mp3s do i have in my ~/mp3 directory"
 {"level": "debug", "class": "toolcall", "message": "request", "obj": {"id": "iwCGjcRic8GAFB2jUvBUOeF9NNrldfxz", "type": "function", "function": {"name": "list_mp3s", "arguments": {"path":"~/mp3"}}}}
 {"level": "debug", "class": "toolcall", "message": "result", "obj": ["Elektrobopacek - Towards the final Battle.mp3", "Elektrobopacek - Escape the Labyrinth.mp3", "Elektrobopacek - Journey to the misty Lands.mp3", "Elektrobopacek - Mistral Forte.mp3", "Elektrobopacek - Leaving Spaceport X-19.mp3", "Elektrobopacek - Dracula Rising.mp3"]}
 Here are the MP3 files in your `~/mp3` directory:
@@ -288,7 +288,7 @@ Would you like to play any of these? Just share the filename, and I can play it 
 
 In this example you can see how nothing is hidden so if the model makes a mistake it is immediately identifiable. 
 
-The debug JSON objects are sent to `stderr` so routing it separately is trivial.
+The debug objects are either JSON objects (with -l json) which are sent to `stderr` so routing it separately is trivial or markdown objects (by default and with -l md) so you can stream them through whatever markdown renderer you are using
 
 ## Example: Agentic Coding
 Using the examples above we can conbine them and get an agentic harness on the cheap:
@@ -380,9 +380,9 @@ usage: llcat [-h] [-su [@]SERVERURL] [-sk [@]SERVERKEY] [-to TIMEOUT]
              [-pr PROTO] [-m [[@]MODEL]] [-s [@]SYSTEM] [-a ATTACH]
              [-c CONVERSATION] [-cr CONVERSATIONRO] [-eb [@]EXTRABODY]
              [-sc [@]SCHEMA] [-mf MCP] [-tp TOOL_PROGRAM] [-tf TOOL_FILE]
-             [-ps] [-bq BE_QUIET] [-nt] [-ns] [-nw] [-f] [--curlify]
-             [--dry] [--version] [--info [INFO]] [--save SAVE]
-             [[@]user_prompt ...]
+             [-l {md,json}] [-ps] [-bq BE_QUIET] [-mt] [-nt] [-ns] [-nw]
+             [-f] [--curlify] [--raw] [--dry] [--version] [--info [INFO]]
+             [--save SAVE] [[@]user_prompt ...]
 
 llcat is /usr/bin/cat for LLMs. 
 
@@ -399,43 +399,48 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -su, -u, --server_url [@]SERVERURL
+  -su [@]SERVERURL, -u [@]SERVERURL, --server_url [@]SERVERURL
                         server URL (e.g., http://::1:8080). Also supports MAS
                         format
-  -sk, -k, --server_key [@]SERVERKEY
+  -sk [@]SERVERKEY, -k [@]SERVERKEY, --server_key [@]SERVERKEY
                         server API key for authorization
-  -to, --timeout TIMEOUT
+  -to TIMEOUT, --timeout TIMEOUT
                         timeout in seconds for the read
-  -pr, --proto PROTO    protocol to use (ollama, llama.cpp, openai, auto)
-  -m, --model [[@]MODEL]
+  -pr PROTO, --proto PROTO
+                        protocol to use (ollama, llama.cpp, openai, auto)
+  -m [[@]MODEL], --model [[@]MODEL]
                         model to use (or list models if no value)
-  -s, --system [@]SYSTEM
+  -s [@]SYSTEM, --system [@]SYSTEM
                         system prompt
-  -a, --attach ATTACH   attach file(s)
-  -c, --conversation CONVERSATION
+  -a ATTACH, --attach ATTACH
+                        attach file(s)
+  -c CONVERSATION, --conversation CONVERSATION
                         conversation history file (r/w)
-  -cr, --conversationro CONVERSATIONRO
+  -cr CONVERSATIONRO, --conversationro CONVERSATIONRO
                         the readonly conversation input (ro)
-  -eb, --extra_body [@]EXTRABODY
+  -eb [@]EXTRABODY, --extra_body [@]EXTRABODY
                         JSON to add to the body, such as max_tokens or
                         temperature
-  -sc, --schema [@]SCHEMA
+  -sc [@]SCHEMA, --schema [@]SCHEMA
                         set a schema to force structured output
-  -mf, --mcp MCP        MCP file to use
-  -tp, --tool_program TOOL_PROGRAM
+  -mf MCP, --mcp MCP    MCP file to use
+  -tp TOOL_PROGRAM, --tool_program TOOL_PROGRAM
                         program to execute tool calls
-  -tf, --tool_file TOOL_FILE
+  -tf TOOL_FILE, --tool_file TOOL_FILE
                         JSON file with tool definitions
+  -l {md,json}, --logstyle {md,json}
+                        logging style
   -ps, --ps             currently running model (if supported)
-  -bq, --be_quiet BE_QUIET
+  -bq BE_QUIET, --be_quiet BE_QUIET
                         make it shutup about things
+  -mt, --md_tools       make tool call output markdown
   -nt, --no_think       disable thinking
   -ns, --no_stream      disable streaming
   -nw, --no_wrap        do not wrap inputs in <xml-like-syntax>
   -f, --force           disable SSL verification
   --curlify             write curl equivalents of calls to stdout
-  --dry                 dry run
   --raw                 raw responses
+  --dry                 dry run
   --version             show program's version number and exit
   --info [INFO]         get the info for a model
   --save SAVE           save an invocation to a reusable JSON file. Supply it
