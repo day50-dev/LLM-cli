@@ -325,7 +325,7 @@ def err_out(what="general", message="", obj=None, code=1, exit=True):
         if LOGSTYLE == 'md':
             if what == 'toolcall':
                 if message == 'request':
-                    out=f'> **{obj_json.get('function').get('name')}**' + f'\n{json.dumps(obj_json.get('function').get('arguments'))}'
+                    out=f'> **{obj_json.get('function').get('name')}**' + f'\n*{json.dumps(obj_json.get('function').get('arguments'))}*'
 
                 elif message == 'result':
                     out = f'>\n**result:**\n{json.dumps(obj_json, indent=2)}\n'
