@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys, requests, json, argparse, subprocess, select, importlib.metadata, traceback, os, logging
+import re, sys, requests, json, argparse, subprocess, select, importlib.metadata, traceback, os, logging
 from pathlib import Path
 
 logging.basicConfig(level=(os.environ.get('LOGLEVEL') or 'warning').upper())
