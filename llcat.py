@@ -515,6 +515,10 @@ def update_convo(args, messages, assistant):
                 do_append = True
 
         if do_append:
+            # llama.cpp requires a content block 
+            if 'content' not in newline:
+                newline['content'] = ''
+
             messages.append(newline)
             try:
                 with open(args.conversation, 'w') as f:
